@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Calculator</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#373c48;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:15px;
+}
+
+.calculator{
+    width:100%;
+    max-width:420px;
+}
+
+.display{
+    background:#c2d3a2;
+    height:180px;
+    border-radius:25px;
+    margin-bottom:20px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-end;
+
+    box-shadow:
+    inset 0 2px 5px rgba(255,255,255,.3),
+    0 8px 20px rgba(0,0,0,.3);
+}
+
+.expression{
+    font-size:24px;
+    color:#4f5c42;
+    min-height:35px;
+    overflow-x:auto;
+}
+
+.result{
+    font-size:80px;
+    color:#394632;
+    font-weight:300;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+button{
+    height:82px;
+    border:none;
+    border-radius:18px;
+    font-size:2rem;
+    font-weight:600;
+    cursor:pointer;
+
+    transition:.15s;
+
+    box-shadow:
+    0 5px 10px rgba(0,0,0,.25);
+}
+
+button:active{
+    transform:scale(.94);
+}
+
+.number{
+    background:#d8d9e2;
+}
+
+.operator{
+    background:#f8a23b;
+}
+
+.equal{
+    background:#ff9b2d;
+}
+
+@media(max-width:480px){
+
+    .display{
+        height:150px;
+    }
+
+    .result{
+        font-size:60px;
+    }
+
+    button{
+        height:70px;
+        font-size:1.7rem;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div class="calculator">
+
+    <div class="display">
+
+        <div class="expression" id="expression"></div>
+
+        <div class="result" id="result">
+            0
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button class="operator" onclick="clearAll()">C</button>
+
+        <button class="operator" onclick="toggleSign()">+/-</button>
+
+        <button class="operator" onclick="deleteLast()">Del</button>
+
+        <button class="operator" onclick="append('/')">÷</button>
+
+        <button class="number" onclick="append('7')">7</button>
+
+        <button class="number" onclick="append('8')">8</button>
+
+        <button class="number" onclick="append('9')">9</button>
+
+        <button class="operator" onclick="append('*')">×</button>
+
+        <button class="number" onclick="append('4')">4</button>
+
+        <button class="number" onclick="append('5')">5</button>
+
+        <button class="number" onclick="append('6')">6</button>
+
+        <button class="operator" onclick="append('-')">-</button>
+
+        <button class="number" onclick="append('1')">1</button>
+
+        <button class="number" onclick="append('2')">2</button>
+
+        <button class="number" onclick="append('3')">3</button>
+
+        <button class="operator" onclick="append('+')">+</button>
+
+        <button class="number" onclick="append('0')">0</button>
+
+        <button class="number" onclick="append('00')">00</button>
+
+        <button class="number" onclick="append('.')">.</button>
+
+        <button class="equal" onclick="calculate()">=</button>
+
+    </div>
+
+</div>
+
+<script>
+
+let expression = "";
+
+const expressionDisplay =
+document.getElementById("expression");
+
+const resultDisplay =
+document.getElementById("result");
+
+function updateScreen(){
+
+    expressionDisplay.textContent =
+    expression;
+
+    resultDisplay.textContent =
+    expression || "0";
+}
+
+function append(value){
+
+    expression += value;
+
+    updateScreen();
+}
+
+function clearAll(){
+
+    expression = "";
+
+    updateScreen();
+}
+
+function deleteLast(){
+
+    expression =
+    expression.slice(0,-1);
+
+    updateScreen();
+}
+
+function toggleSign(){
+
+    if(!expression) return;
+
+    try{
+
+        let num =
+        parseFloat(expression);
+
+        if(!isNaN(num)){
+
+            expression =
+            String(num * -1);
+
+            updateScreen();
+        }
+
+    }catch(err){}
+}
+
+function calculate(){
+
+    try{
+
+        let result =
+        Function(
+        '"use strict";return (' +
+        expression + ')'
+        )();
+
+        expression =
+        String(result);
+
+        resultDisplay.textContent =
+        result;
+
+    }catch{
+
+        resultDisplay.textContent =
+        "Error";
+
+        setTimeout(()=>{
+
+            expression="";
+
+            updateScreen();
+
+        },1000);
+    }
+}
+
+document.addEventListener("keydown",e=>{
+
+    const key = e.key;
+
+    if(
+        (key >= "0" && key <= "9") ||
+        ['+','-','*','/','.']
+        .includes(key)
+    ){
+
+        append(key);
+    }
+
+    if(key==="Enter")
+        calculate();
+
+    if(key==="Backspace")
+        deleteLast();
+
+    if(key==="Escape")
+        clearAll();
+});
+
+</script>
+
+</body>
+</html>
